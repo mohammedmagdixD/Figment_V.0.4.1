@@ -14,6 +14,7 @@ export default defineConfig(({mode}) => {
         registerType: 'autoUpdate',
         injectRegister: 'auto',
         workbox: {
+          cleanupOutdatedCaches: true,
           globPatterns: ['**/*.{js,css,html,png,jpg,jpeg,svg,webp,ico,woff,woff2}'],
           navigateFallback: '/index.html',
           runtimeCaching: [
