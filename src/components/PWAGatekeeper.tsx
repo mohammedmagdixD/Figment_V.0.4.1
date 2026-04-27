@@ -72,6 +72,7 @@ export function PWAGatekeeper({ children }: PWAGatekeeperProps) {
     
     if (outcome === 'accepted') {
       setDeferredPrompt(null);
+      setIsStandalone(true);
     }
   };
 

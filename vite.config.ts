@@ -12,7 +12,7 @@ export default defineConfig(({mode}) => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        injectRegister: 'auto',
+        injectRegister: null,
         includeAssets: ['favicon.ico', 'icon-192x192.png', 'icon-512x512.png'],
         workbox: {
           cleanupOutdatedCaches: true,
@@ -66,9 +66,8 @@ export default defineConfig(({mode}) => {
             }
           ]
         },
-        manifestFilename: 'manifest.webmanifest',
+        manifestFilename: 'manifest.json',
         manifest: {
-          id: '/',
           name: 'Figment',
           short_name: 'Figment',
           description: 'Your personal media catalog',
