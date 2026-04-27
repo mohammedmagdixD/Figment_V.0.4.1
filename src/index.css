@@ -1,0 +1,229 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+:root {
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+  --safe-left: env(safe-area-inset-left);
+  --safe-right: env(safe-area-inset-right);
+
+  --system-background:            #FFFFF7;
+  --secondary-system-background:  #F2F2F7;
+  --tertiary-system-background:   #FFFFF7;
+  --label:                        #0D0D0D;
+  --Accent:                       #191970;
+  --secondary-label:              rgba(60, 60, 67, 0.60);
+  --tertiary-label:               rgba(60, 60, 67, 0.30);
+  --separator:                    rgba(60, 60, 67, 0.29);
+
+  --card-width: 120px;
+  --scroll-padding-x: 16px;
+  --card-gap: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --system-background:            #0D0D0D;
+    --secondary-system-background:  #1C1C1E;
+    --tertiary-system-background:   #2C2C2E;
+    --label:                        #FFFFF7;
+    --Accent:                       #191970;
+    --secondary-label:              rgba(235, 235, 245, 0.60);
+    --tertiary-label:               rgba(235, 235, 245, 0.30);
+    --separator:                    rgba(84, 84, 88, 0.65);
+  }
+}
+
+.dark {
+  --system-background:            #0D0D0D;
+  --secondary-system-background:  #1C1C1E;
+  --tertiary-system-background:   #2C2C2E;
+  --label:                        #FFFFF7;
+  --Accent:                       #191970;
+  --secondary-label:              rgba(235, 235, 245, 0.60);
+  --tertiary-label:               rgba(235, 235, 245, 0.30);
+  --separator:                    rgba(84, 84, 88, 0.65);
+}
+
+.card-vertical .card-image {
+  width: var(--card-width);
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+}
+
+.card-square .card-image {
+  width: var(--card-width);
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.horizontal-scroll-container {
+  display: flex;
+  flex-direction: row;
+  gap: var(--card-gap);
+  padding-left: var(--scroll-padding-x);
+  padding-right: var(--scroll-padding-x);
+  overflow-x: auto;
+  scroll-padding-left: var(--scroll-padding-x);
+  -webkit-overflow-scrolling: touch;
+  box-sizing: content-box;
+}
+
+.card-container {
+  width: var(--card-width);
+  max-width: var(--card-width);
+  flex-shrink: 0;
+}
+
+.card-text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  max-width: var(--card-width);
+  display: block;
+}
+
+/* Global scroll feel */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent rubber-band scroll on the body itself (keep it on scroll containers) */
+html, body {
+  overscroll-behavior-y: none; /* Stops iOS elastic bounce effect */
+  -webkit-tap-highlight-color: transparent; /* Removes touch flash globally */
+  touch-action: manipulate; /* Hardware-accelerated tap actions and scrolling */
+  background-color: var(--system-background); /* Default light theme background */
+}
+
+/* Eradicate text-selection highlight when dragging or double tapping UI components */
+.user-select-none {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Eliminate system long-press menus on images that native apps don't have */
+img {
+  -webkit-touch-callout: none; 
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Dark mode body background */
+html.dark body {
+  background-color: var(--system-background); 
+  color: var(--label); 
+}
+/* Individual scroll containers */
+.scroll-container {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
+}
+
+.scroll-locked,
+.scroll-locked .scroll-container {
+  overflow: hidden !important;
+}
+
+.overlay-content {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@theme {
+  --font-sans: "Satoshi", sans-serif;
+  --font-serif: "Fraunces", serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Typography Tokens */
+  --text-hero: 34px;
+  --text-hero--line-height: 41px;
+  --text-hero--letter-spacing: 0.37px;
+
+  --text-title1: 28px;
+  --text-title1--line-height: 34px;
+  --text-title1--letter-spacing: 0.36px;
+
+  --text-title2: 22px;
+  --text-title2--line-height: 28px;
+  --text-title2--letter-spacing: 0.35px;
+
+  --text-title3: 20px;
+  --text-title3--line-height: 25px;
+  --text-title3--letter-spacing: 0.38px;
+
+  --text-headline: 17px;
+  --text-headline--line-height: 22px;
+  --text-headline--letter-spacing: -0.41px;
+
+  --text-body: 17px;
+  --text-body--line-height: 22px;
+  --text-body--letter-spacing: -0.41px;
+
+  --text-callout: 16px;
+  --text-callout--line-height: 21px;
+  --text-callout--letter-spacing: -0.32px;
+
+  --text-subhead: 15px;
+  --text-subhead--line-height: 20px;
+  --text-subhead--letter-spacing: -0.24px;
+
+  --text-footnote: 13px;
+  --text-footnote--line-height: 18px;
+  --text-footnote--letter-spacing: -0.08px;
+
+  --text-caption1: 12px;
+  --text-caption1--line-height: 16px;
+  --text-caption1--letter-spacing: 0px;
+
+  --text-caption2: 11px;
+  --text-caption2--line-height: 13px;
+  --text-caption2--letter-spacing: 0.06px;
+
+  /* Map iOS CSS variables to Tailwind colors */
+  --color-system-background: var(--system-background);
+  --color-secondary-system-background: var(--secondary-system-background);
+  --color-tertiary-system-background: var(--tertiary-system-background);
+  --color-label: var(--label);
+  --color-secondary-label: var(--secondary-label);
+  --color-tertiary-label: var(--tertiary-label);
+  --color-separator: var(--separator);
+  --color-overlay: rgba(0, 0, 0, 0.4); /* Standard iOS dimming overlay */
+
+  /* iOS Semantic Colors */
+  --color-ios-blue: #007AFF;
+  --color-ios-green: #34C759;
+  --color-ios-red: #FF3B30;
+  --color-ios-orange: #FF9500;
+  --color-ios-gray-1: #8E8E93;
+  --color-ios-gray-2: #AEAEB2;
+  --color-ios-gray-3: #C7C7CC;
+  --color-ios-gray-4: #D1D1D6;
+  --color-ios-gray-5: #E5E5EA;
+  --color-ios-gray-6: #F2F2F7;
+
+  /* Safe Area Spacing */
+  --spacing-safe-top: env(safe-area-inset-top);
+  --spacing-safe-bottom: env(safe-area-inset-bottom);
+}
+
+@layer utilities {
+  .hide-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+}
