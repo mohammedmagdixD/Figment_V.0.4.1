@@ -2,12 +2,24 @@ import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-import './pwa.ts';
 import { ThemeProvider } from './components/ThemeProvider.tsx';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { PWAGatekeeper } from './components/PWAGatekeeper.tsx';
 import { SWRConfig } from 'swr';
 import { swrLocalStorageProvider } from './utils/swrCache.ts';
+import { registerSW } from 'virtual:pwa-register';
+
+// Register service worker and handle updates
+if ('serviceWorker' in navigator) {
+  registerSW({
+    onNeedRefresh() {
+      console.log('App update ready');
+    },
+    onOfflineReady() {
+      console.log('App is completely cached for offline use');
+    },
+  });
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

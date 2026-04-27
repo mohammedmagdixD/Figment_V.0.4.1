@@ -12,7 +12,7 @@ export default defineConfig(({mode}) => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        injectRegister: null,
+        injectRegister: 'auto',
         includeAssets: ['favicon.ico', 'icon-192x192.png', 'icon-512x512.png'],
         workbox: {
           cleanupOutdatedCaches: true,
@@ -66,7 +66,7 @@ export default defineConfig(({mode}) => {
             }
           ]
         },
-        manifestFilename: 'manifest.json',
+        manifestFilename: 'manifest.webmanifest',
         manifest: {
           id: '/',
           name: 'Figment',
@@ -82,13 +82,25 @@ export default defineConfig(({mode}) => {
               src: '/icon-192x192.png',
               sizes: '192x192',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any'
             },
             {
               src: '/icon-512x512.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any'
+            },
+            {
+              src: '/icon-192x192.png',
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'maskable'
+            },
+            {
+              src: '/icon-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable'
             }
           ]
         },
