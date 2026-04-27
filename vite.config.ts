@@ -12,7 +12,7 @@ export default defineConfig(({mode}) => {
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
-        injectRegister: 'auto',
+        injectRegister: null,
         includeAssets: ['favicon.ico', 'icon-192x192.png', 'icon-512x512.png'],
         workbox: {
           cleanupOutdatedCaches: true,
@@ -66,8 +66,9 @@ export default defineConfig(({mode}) => {
             }
           ]
         },
-        manifestFilename: 'manifest.webmanifest',
+        manifestFilename: 'manifest.json',
         manifest: {
+          id: '/',
           name: 'Figment',
           short_name: 'Figment',
           description: 'Your personal media catalog',
@@ -81,25 +82,13 @@ export default defineConfig(({mode}) => {
               src: '/icon-192x192.png',
               sizes: '192x192',
               type: 'image/png',
-              purpose: 'any'
+              purpose: 'any maskable'
             },
             {
               src: '/icon-512x512.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any'
-            },
-            {
-              src: '/icon-192x192.png',
-              sizes: '192x192',
-              type: 'image/png',
-              purpose: 'maskable'
-            },
-            {
-              src: '/icon-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'maskable'
+              purpose: 'any maskable'
             }
           ]
         },
@@ -119,6 +108,7 @@ export default defineConfig(({mode}) => {
       },
     },
     build: {
+      chunkSizeWarningLimit: 1000,
       rollupOptions: {
         output: {
           manualChunks: {

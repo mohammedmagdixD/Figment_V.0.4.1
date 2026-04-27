@@ -90,8 +90,17 @@ export function PWAGatekeeper({ children }: PWAGatekeeperProps) {
         initial={{ opacity: 0, y: 40, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="w-full max-w-sm flex flex-col items-center text-center"
+        className="w-full max-w-sm flex flex-col items-center text-center relative"
       >
+        <div className="absolute top-4 right-4 z-10 w-full flex justify-end mb-4 pr-1">
+          <button 
+             onClick={() => setIsStandalone(true)}
+             className="text-secondary-label bg-secondary-system-background px-3 py-1.5 rounded-full text-sm font-medium border border-separator/20 hover:opacity-80"
+          >
+            Skip for now
+          </button>
+        </div>
+        <img src="/icon-192x192.png" alt="Figment" className="w-24 h-24 rounded-[1.25rem] shadow-md border border-separator/10 mt-8 mb-5" />
         <h1 className="text-3xl font-serif font-bold mb-3 tracking-tight">Install Figment</h1>
         <p className="text-secondary-label mb-8 leading-relaxed">
           For the best experience, please install Figment to your home screen.
