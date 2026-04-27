@@ -13,7 +13,7 @@ export default defineConfig(({mode}) => {
       VitePWA({
         registerType: 'autoUpdate',
         injectRegister: 'auto',
-        includeAssets: ['favicon.ico', 'icon-192x192.png', 'icon-512x512.png', 'apple-touch-icon.png'],
+        includeAssets: ['favicon.ico', 'icon-192x192.png', 'icon-512x512.png'],
         workbox: {
           cleanupOutdatedCaches: true,
           globPatterns: ['**/*.{js,css,html,png,jpg,jpeg,svg,webp,ico,woff,woff2}'],
@@ -28,21 +28,6 @@ export default defineConfig(({mode}) => {
                 expiration: {
                   maxEntries: 200,
                   maxAgeSeconds: 60 * 60 * 24 * 7, // 7 Days
-                },
-                cacheableResponse: {
-                  statuses: [0, 200]
-                }
-              }
-            },
-            {
-              // Static Media (Cache-First)
-              urlPattern: /\.(?:png|jpg|jpeg|svg|webp|ico|gif|webm|mp4)$/i,
-              handler: 'CacheFirst',
-              options: {
-                cacheName: 'static-media-cache',
-                expiration: {
-                  maxEntries: 1000,
-                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30 Days
                 },
                 cacheableResponse: {
                   statuses: [0, 200]
