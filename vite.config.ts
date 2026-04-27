@@ -13,7 +13,7 @@ export default defineConfig(({mode}) => {
       VitePWA({
         registerType: 'autoUpdate',
         injectRegister: null,
-        includeAssets: ['favicon.ico', 'icon-192x192.png', 'icon-512x512.png'],
+        includeAssets: ['favicon.ico', 'icon-pwa-192.png', 'icon-pwa-512.png'],
         workbox: {
           cleanupOutdatedCaches: true,
           globPatterns: ['**/*.{js,css,html,png,jpg,jpeg,svg,webp,ico,woff,woff2}'],
@@ -68,6 +68,7 @@ export default defineConfig(({mode}) => {
         },
         manifestFilename: 'manifest.json',
         manifest: {
+          id: '/?pwa=1',
           name: 'Figment',
           short_name: 'Figment',
           description: 'Your personal media catalog',
@@ -78,25 +79,25 @@ export default defineConfig(({mode}) => {
           start_url: '/',
           icons: [
             {
-              src: '/icon-192x192.png',
+              src: '/icon-pwa-192.png',
               sizes: '192x192',
               type: 'image/png',
               purpose: 'any'
             },
             {
-              src: '/icon-512x512.png',
+              src: '/icon-pwa-512.png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'any'
             },
             {
-              src: '/icon-192x192.png',
+              src: '/icon-pwa-192.png',
               sizes: '192x192',
               type: 'image/png',
               purpose: 'maskable'
             },
             {
-              src: '/icon-512x512.png',
+              src: '/icon-pwa-512.png',
               sizes: '512x512',
               type: 'image/png',
               purpose: 'maskable'
