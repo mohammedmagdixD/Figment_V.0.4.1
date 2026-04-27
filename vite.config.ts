@@ -13,6 +13,7 @@ export default defineConfig(({mode}) => {
       VitePWA({
         registerType: 'autoUpdate',
         injectRegister: 'auto',
+        includeAssets: ['favicon.ico', 'icon-192x192.png', 'icon-512x512.png', 'apple-touch-icon.png'],
         workbox: {
           cleanupOutdatedCaches: true,
           globPatterns: ['**/*.{js,css,html,png,jpg,jpeg,svg,webp,ico,woff,woff2}'],
@@ -80,7 +81,7 @@ export default defineConfig(({mode}) => {
             }
           ]
         },
-        manifestFilename: 'manifest.json',
+        manifestFilename: 'manifest.webmanifest',
         manifest: {
           name: 'Figment',
           short_name: 'Figment',
@@ -95,13 +96,25 @@ export default defineConfig(({mode}) => {
               src: '/icon-192x192.png',
               sizes: '192x192',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any'
             },
             {
               src: '/icon-512x512.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any'
+            },
+            {
+              src: '/icon-192x192.png',
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'maskable'
+            },
+            {
+              src: '/icon-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable'
             }
           ]
         },
