@@ -80,12 +80,13 @@ export default defineConfig(({mode}) => {
             }
           ]
         },
+        manifestFilename: 'manifest.json',
         manifest: {
           name: 'Figment',
           short_name: 'Figment',
           description: 'Your personal media catalog',
-          theme_color: '#000000',
-          background_color: '#000000',
+          theme_color: '#0D0D0D',
+          background_color: '#0D0D0D',
           display: 'standalone',
           scope: '/',
           start_url: '/',
@@ -94,19 +95,13 @@ export default defineConfig(({mode}) => {
               src: '/icon-192x192.png',
               sizes: '192x192',
               type: 'image/png',
-              purpose: 'any'
+              purpose: 'any maskable'
             },
             {
               src: '/icon-512x512.png',
               sizes: '512x512',
               type: 'image/png',
-              purpose: 'any'
-            },
-            {
-              src: '/icon-512x512.png',
-              sizes: '512x512',
-              type: 'image/png',
-              purpose: 'maskable'
+              purpose: 'any maskable'
             }
           ]
         },
