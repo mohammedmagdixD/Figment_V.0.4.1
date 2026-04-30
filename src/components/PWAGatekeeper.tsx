@@ -16,13 +16,6 @@ export function PWAGatekeeper({ children }: PWAGatekeeperProps) {
   useEffect(() => {
     setIsMounted(true);
     
-    // Check if user previously skipped the gatekeeper
-    const hasSkipped = localStorage.getItem('figment-pwa-skipped') === 'true';
-    if (hasSkipped) {
-      setIsStandalone(true);
-      return;
-    }
-
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.ready.then(reg => {
         console.log('SW Ready:', reg.scope);
@@ -71,11 +64,6 @@ export function PWAGatekeeper({ children }: PWAGatekeeperProps) {
     };
   }, []);
 
-  const handleSkip = () => {
-    localStorage.setItem('figment-pwa-skipped', 'true');
-    setIsStandalone(true);
-  };
-
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
     
@@ -84,7 +72,7 @@ export function PWAGatekeeper({ children }: PWAGatekeeperProps) {
     
     if (outcome === 'accepted') {
       setDeferredPrompt(null);
-      handleSkip();
+      setIsStandalone(true);
     }
   };
 
@@ -107,13 +95,13 @@ export function PWAGatekeeper({ children }: PWAGatekeeperProps) {
       >
         <div className="absolute top-4 right-4 z-10 w-full flex justify-end mb-4 pr-1">
           <button 
-             onClick={handleSkip}
+             onClick={() => setIsStandalone(true)}
              className="text-secondary-label bg-secondary-system-background px-3 py-1.5 rounded-full text-sm font-medium border border-separator/20 hover:opacity-80"
           >
             Skip for now
           </button>
         </div>
-        <img src="/icon-pwa-192.png" alt="Figment" className="w-24 h-24 rounded-[1.25rem] shadow-md border border-separator/10 mt-8 mb-5" />
+        <img src="/icon-192x192.png" alt="Figment" className="w-24 h-24 rounded-[1.25rem] shadow-md border border-separator/10 mt-8 mb-5" />
         <h1 className="text-3xl font-serif font-bold mb-3 tracking-tight">Install Figment</h1>
         <p className="text-secondary-label mb-8 leading-relaxed">
           For the best experience, please install Figment to your home screen.
@@ -136,7 +124,7 @@ export function PWAGatekeeper({ children }: PWAGatekeeperProps) {
               </li>
             </ol>
             <button
-              onClick={handleSkip}
+              onClick={() => setIsStandalone(true)}
               className="w-full mt-6 py-4 px-6 bg-secondary-system-background text-label rounded-full font-bold text-lg hover:opacity-90 transition-opacity border border-separator/20"
             >
               Continue in Browser
@@ -170,7 +158,7 @@ export function PWAGatekeeper({ children }: PWAGatekeeperProps) {
             )}
             
             <button
-              onClick={handleSkip}
+              onClick={() => setIsStandalone(true)}
               className="w-full py-4 px-6 bg-secondary-system-background text-label rounded-full font-bold text-lg hover:opacity-90 transition-opacity"
             >
               Continue in Browser
