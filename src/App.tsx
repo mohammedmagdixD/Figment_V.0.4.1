@@ -141,6 +141,13 @@ export default function App() {
     viewingUserIdRef.current = viewingUserId;
   }, [viewingUserId]);
 
+  // Close the auth modal automatically once the user is authenticated
+  useEffect(() => {
+    if (user && isAuthModalOpen) {
+      setIsAuthModalOpen(false);
+    }
+  }, [user, isAuthModalOpen]);
+
   useEffect(() => {
     async function loadData(path: string) {
       try {
