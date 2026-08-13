@@ -1,0 +1,16 @@
+{
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "dist/**",
+      "memory": 1024,
+      "maxDuration": 15
+    }
+  },
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.ts" },
+    { "src": "/m/(.*)", "dest": "/api/index.ts" },
+    { "src": "/@(.*)", "dest": "/api/index.ts" },
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}
