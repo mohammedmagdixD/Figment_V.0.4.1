@@ -3,16 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Figment" />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fffff7" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0D0D0D" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192x192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/icon-512x512.png" />
-    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192x192.png" />
     
     <!-- Explicit font links help html-to-image embed them perfectly compared to @import -->
     <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
@@ -21,13 +17,6 @@
     <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,300,400&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap" rel="stylesheet" />
     
-    <script>
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        window.deferredPrompt = e;
-        window.dispatchEvent(new CustomEvent('pwa-prompt-ready', { detail: e }));
-      });
-    </script>
     
     <title>Figment</title>
   </head>
@@ -36,4 +25,3 @@
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
