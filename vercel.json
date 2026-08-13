@@ -7,9 +7,9 @@
     }
   },
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/index.ts" },
-    { "src": "/m/(.*)", "dest": "/api/index.ts" },
-    { "src": "/@(.*)", "dest": "/api/index.ts" },
+    { "src": "/api/.*", "dest": "/api/index.ts" },
+    { "src": "/m/.*", "dest": "/api/index.ts" },
+    { "src": "/@.*", "dest": "/api/index.ts" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
