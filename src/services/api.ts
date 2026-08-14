@@ -513,110 +513,51 @@ export async function getBookDetails(id: string): Promise<GoogleBooksVolumeDetai
 }
 
 export async function getAudioDetails(item: SearchResult & { header?: { subtitle?: string }, type?: string }): Promise<ITunesAudioAdapterInput> {
+  const artistName = item.subtitle || item.header?.subtitle || '';
+  const titleName = item.title || '';
+  const query = encodeURIComponent(`${titleName} ${artistName}`);
+  const isAlbum = item.type === 'album';
+  
   let backdropUrl: string | null = null;
   let backdropFallback = false;
-  let actionButton: ITunesAudioAdapterInput['actionButton'] = undefined;
-  let streamingLinks: ITunesAudioAdapterInput['streamingLinks'] = null;
 
-  const artistName = item.subtitle || item.header?.subtitle || '';
-
-  const isSpotify = item.url?.includes('spotify.com');
-  const platform = isSpotify ? 'spotify' : 'itunes';
-
-  // Step 1: Fetch Odesli Links
-  let videoId: string | null = null;
   try {
-    const odesliType = item.type === 'album' ? 'album' : 'song';
-    const odesliUrl = isSpotify && item.url
-      ? `/api/odesli?url=${encodeURIComponent(item.url)}`
-      : `/api/odesli?platform=${platform}&type=${odesliType}&id=${item.id}`;
-    console.log('Fetching Odesli:', odesliUrl);
-    const res = await fetchWithBackoff(odesliUrl);
-    if (res.ok) {
-      const data = await res.json();
-      console.log('Odesli data:', data);
-      if (data && data.linksByPlatform) {
-        streamingLinks = data.linksByPlatform;
-        console.log('Streaming links set:', streamingLinks);
-        
-        // Extract YouTube video ID from Odesli links
-        const ytEntity = streamingLinks.youtube || streamingLinks.youtubeMusic;
-        if (ytEntity && ytEntity.entityUniqueId) {
-          const entityData = data.entitiesByUniqueId?.[ytEntity.entityUniqueId];
-          if (entityData && entityData.thumbnailUrl) {
-            backdropUrl = entityData.thumbnailUrl;
-          }
-          
-          const parts = ytEntity.entityUniqueId.split('::');
-          if (parts.length > 1 && parts[1].length === 11) {
-            videoId = parts[1];
-          }
-        }
-        
-        // Fallback to URL regex if entityUniqueId is missing or didn't work
-        if (!videoId) {
-          const ytLink = streamingLinks.youtube?.url || streamingLinks.youtubeMusic?.url;
-          if (ytLink) {
-            const match = ytLink.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
-            if (match && match[1]) {
-              videoId = match[1];
-            }
-          }
-        }
+    // 1. ListenBrainz metadata lookup
+    const lbUrl = `https://api.listenbrainz.org/1/metadata/lookup/?artist_name=${encodeURIComponent(artistName)}&recording_name=${encodeURIComponent(titleName)}`;
+    const lbRes = await fetch(lbUrl, { headers: { 'Accept': 'application/json' } });
+    if (lbRes.ok) {
+      const lbData = await lbRes.json();
+      const releaseMbid = lbData?.release_mbid;
+      if (releaseMbid) {
+        backdropUrl = `https://coverartarchive.org/release/${releaseMbid}/front`;
       }
-    } else {
-      console.error('Odesli fetch failed with status:', res.status);
     }
-  } catch (e) {
-    console.debug('Odesli API failed in adapter', e);
+  } catch (error) {
+    console.error('ListenBrainz lookup failed:', error);
   }
 
-  if (videoId) {
-    if (!backdropUrl) {
-      backdropUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-    }
-    actionButton = {
-      type: 'trailer',
-      payload: `https://www.youtube.com/watch?v=${videoId}`
-    };
-  }
-
-  // Step 2: TheAudioDB (Fallback 1)
+  // 2. Fallback to TheAudioDB/iTunes logic for backdrop if needed
   if (!backdropUrl) {
-    try {
-      const adbRes = await fetchWithBackoff(`https://www.theaudiodb.com/api/v1/json/2/search.php?s=${encodeURIComponent(artistName)}`);
-      if (adbRes.ok) {
-        const adbData = await adbRes.json();
-        if (adbData.artists && adbData.artists.length > 0 && adbData.artists[0].strArtistFanart) {
-          backdropUrl = adbData.artists[0].strArtistFanart;
-        }
-      }
-    } catch (e) {
-      console.warn('TheAudioDB API failed', e);
-    }
-  }
-
-  // Step 3: iTunes square album art (Fallback 2)
-  if (!backdropUrl) {
-    const imageUrl = item.image || (item as any).images?.posterUrl;
-    backdropUrl = imageUrl?.replace('100x100bb', '600x600bb') || imageUrl;
     backdropFallback = true;
+    backdropUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(titleName)}&background=random&size=512`;
   }
 
-  let trackDetails: ITunesAudioDetails | null = null;
-  try {
-    const itunesRes = await fetchWithBackoff(`https://itunes.apple.com/lookup?id=${item.id}`);
-    if (itunesRes.ok) {
-      const itunesData = await itunesRes.json();
-      if (itunesData.results && itunesData.results.length > 0) {
-        trackDetails = itunesData.results[0];
-      }
-    }
-  } catch (e) {
-    console.error('iTunes lookup failed', e);
-  }
+  // 3. Fallback YouTube Search Link instead of precise Odesli streaming links
+  const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${query}`;
+  
+  const streamingLinks = [{
+    platform: 'youtube',
+    url: youtubeSearchUrl,
+    iconUrl: 'https://www.youtube.com/favicon.ico'
+  }];
 
-  return { trackDetails, item, backdropUrl, backdropFallback, actionButton, streamingLinks };
+  return {
+    ...item,
+    backdropUrl,
+    backdropFallback,
+    streamingLinks,
+    actionButton: undefined
+  };
 }
 
 export async function fetchRelatedMedia(item: UniversalMediaData): Promise<{ listTitle: string; items: UniversalMediaData[] }[]> {
