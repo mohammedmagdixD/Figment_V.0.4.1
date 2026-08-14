@@ -1,11 +1,11 @@
 import express from 'express';
 import cors from 'cors';
-import { isFetchError } from './src/types/api.ts';
-import type { FetchError } from './src/types/api.ts';
+import { isFetchError } from './src/types/api.js';
+import type { FetchError } from './src/types/api.js';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import fs from 'fs';
-import { fetchWithCache } from './src/utils/cache.ts';
+import { fetchWithCache } from './src/utils/cache.js';
 import { createClient } from '@supabase/supabase-js';
 import satori from 'satori';
 import { html } from 'satori-html';
@@ -31,8 +31,8 @@ const PORT = 3000;
 app.use(cors());
 
 // Initialize Supabase client for OG tag injection
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || 'placeholder';
 const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
 
 // Spotify Auth Token Cache
@@ -160,7 +160,7 @@ app.get('/api/mal/*', async (req, res) => {
   try {
     const endpoint = req.params[0];
     const queryParams = new URLSearchParams(req.query as Record<string, string>).toString();
-    const url = `https://api.myanimelist.net/v2/${endpoint}${queryParams ? `?${queryParams}` : ''}`;
+    const url = `https://api.myanimelist.net/v2/${endpoint}${queryParams ? \`?\${queryParams}\` : ''}`;
     
     const cacheKey = `mal:${endpoint}:${queryParams}`;
     const TTL = 24 * 60 * 60; // 24 hours
@@ -273,7 +273,7 @@ app.get('/api/books/*', async (req, res) => {
     }
     
     const queryString = queryParams.toString();
-    const url = `https://www.googleapis.com/books/v1/${endpoint}${queryString ? `?${queryString}` : ''}`;
+    const url = `https://www.googleapis.com/books/v1/${endpoint}${queryString ? \`?\${queryString}\` : ''}`;
     
     const cacheKey = `books:${endpoint}:${queryString}`;
     const TTL = (endpoint === 'volumes' && queryString.includes('q=')) ? 60 * 60 : 24 * 60 * 60; // 1 hour for search, 24 hours for details
@@ -308,7 +308,7 @@ app.get('/api/books/*', async (req, res) => {
 
 // Vite middleware for development
 let vite: any;
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
   vite = await createViteServer({
     server: { middlewareMode: true },
     appType: 'spa',
