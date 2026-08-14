@@ -347,7 +347,7 @@ app.get('/api/og/@:handle', async (req, res) => {
 
     await loadFonts();
 
-    const markup = html\`
+    const markup = html`
       <div style="display: flex; flex-direction: column; width: 1200px; height: 630px; background-color: #050505; background-image: linear-gradient(135deg, #0f172a 0%, #000000 100%); position: relative; overflow: hidden; align-items: center; justify-content: center; font-family: 'Inter', sans-serif;">
         
         <!-- Decorative elements -->
@@ -359,14 +359,14 @@ app.get('/api/og/@:handle', async (req, res) => {
           
           <!-- Avatar -->
           <div style="display: flex; width: 220px; height: 220px; border-radius: 110px; overflow: hidden; border: 2px solid rgba(255,255,255,0.15); margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-            \${avatarBase64 ? \`<img src="\${avatarBase64}" width="220" height="220" style="object-fit: cover;" />\` : \`<div style="width: 220px; height: 220px; background-color: rgba(255,255,255,0.05);"></div>\`}
+            ${avatarBase64 ? `<img src="${avatarBase64}" width="220" height="220" style="object-fit: cover;" />` : `<div style="width: 220px; height: 220px; background-color: rgba(255,255,255,0.05);"></div>`}
           </div>
 
           <!-- Text Content -->
           <div style="display: flex; flex-direction: column; align-items: center;">
-            <div style="font-size: 84px; font-weight: 700; color: #ffffff; letter-spacing: -0.02em; margin-bottom: 10px; text-align: center;">\${name}</div>
-            <div style="font-size: 36px; font-weight: 400; color: rgba(255,255,255,0.5); margin-bottom: 30px;">@\${handle}</div>
-            <div style="font-size: 28px; font-weight: 400; color: rgba(255,255,255,0.6); text-align: center; max-width: 800px; line-height: 1.5;">\${bio}</div>
+            <div style="font-size: 84px; font-weight: 700; color: #ffffff; letter-spacing: -0.02em; margin-bottom: 10px; text-align: center;">${name}</div>
+            <div style="font-size: 36px; font-weight: 400; color: rgba(255,255,255,0.5); margin-bottom: 30px;">@${handle}</div>
+            <div style="font-size: 28px; font-weight: 400; color: rgba(255,255,255,0.6); text-align: center; max-width: 800px; line-height: 1.5;">${bio}</div>
           </div>
           
           <!-- Bottom Branding -->
@@ -376,7 +376,7 @@ app.get('/api/og/@:handle', async (req, res) => {
           </div>
         </div>
       </div>
-    \`;
+    `;
 
     const svg = await satori(markup as any, {
       width: 1200,
@@ -425,7 +425,7 @@ app.get('/@:handle', async (req, res, next) => {
     const { data: userProfile, error } = await supabase
       .from('users')
       .select('name, bio, avatar_url')
-      .or(\`handle.eq.\${handle},username.eq.\${handle}\`)
+      .or(`handle.eq.${handle},username.eq.${handle}`)
       .single();
 
     if (error || !userProfile) {
@@ -441,29 +441,29 @@ app.get('/@:handle', async (req, res, next) => {
     }
 
     const name = userProfile.name || 'Anonymous';
-    const bio = userProfile.bio || \`Check out \${name}'s profile on Figment.\`;
-    const ogImageUrl = \`https://\${req.get('host')}/api/og/@\${handle}\`;
+    const bio = userProfile.bio || `Check out ${name}'s profile on Figment.`;
+    const ogImageUrl = `https://${req.get('host')}/api/og/@${handle}`;
 
-    const ogTags = \`
-      <title>\${name} (@\${handle}) | Figment</title>
-      <meta name="description" content="\${bio}" />
-      <meta property="og:title" content="\${name} (@\${handle}) | Figment" />
-      <meta property="og:description" content="\${bio}" />
-      <meta property="og:image" content="\${ogImageUrl}" />
+    const ogTags = `
+      <title>${name} (@${handle}) | Figment</title>
+      <meta name="description" content="${bio}" />
+      <meta property="og:title" content="${name} (@${handle}) | Figment" />
+      <meta property="og:description" content="${bio}" />
+      <meta property="og:image" content="${ogImageUrl}" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:image:type" content="image/png" />
-      <meta property="og:url" content="https://\${req.get('host')}/@\${handle}" />
+      <meta property="og:url" content="https://${req.get('host')}/@${handle}" />
       <meta property="og:type" content="profile" />
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="\${name} (@\${handle}) | Figment" />
-      <meta name="twitter:description" content="\${bio}" />
-      <meta name="twitter:image" content="\${ogImageUrl}" />
-    \`;
+      <meta name="twitter:title" content="${name} (@${handle}) | Figment" />
+      <meta name="twitter:description" content="${bio}" />
+      <meta name="twitter:image" content="${ogImageUrl}" />
+    `;
 
     const html = template.replace(
       '</head>',
-      \`\${ogTags}</head>\`
+      `${ogTags}</head>`
     );
 
     res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
@@ -491,7 +491,7 @@ app.get('/api/image-proxy', async (req, res) => {
     });
     
     if (!response.ok) {
-      throw new Error(\`Fetch failed: \${response.status} \${response.statusText}\`);
+      throw new Error(`Fetch failed: ${response.status} ${response.statusText}`);
     }
 
     const contentType = response.headers.get('content-type');
@@ -517,22 +517,22 @@ app.get('/m/:type/:id', async (req, res, next) => {
     const userAgent = req.headers['user-agent'] || '';
     const isBot = /bot|chatgpt|facebookexternalhit|whatsapp|twitterbot|discordbot|slackbot/i.test(userAgent);
 
-    let imgUrl = \`https://\${req.get('host')}/apple-touch-icon.png\`; // Fallback image
+    let imgUrl = `https://${req.get('host')}/apple-touch-icon.png`; // Fallback image
 
     if (isBot) {
-      return res.send(\`
+      return res.send(`
         <!DOCTYPE html>
         <html>
           <head>
             <meta property="og:title" content="View on Figment" />
             <meta property="og:description" content="Click to view full details." />
-            <meta property="og:image" content="\${imgUrl}" />
-            <meta property="og:url" content="https://\${req.get('host')}/m/\${type}/\${id}" />
+            <meta property="og:image" content="${imgUrl}" />
+            <meta property="og:url" content="https://${req.get('host')}/m/${type}/${id}" />
             <meta name="twitter:card" content="summary_large_image" />
           </head>
           <body></body>
         </html>
-      \`);
+      `);
     }
 
     let template: string;
@@ -543,14 +543,14 @@ app.get('/m/:type/:id', async (req, res, next) => {
       template = fs.readFileSync(path.resolve(process.cwd(), 'dist/index.html'), 'utf-8');
     }
     
-    const ogTags = \`
+    const ogTags = `
       <title>Shared Media | Figment</title>
       <meta property="og:title" content="View on Figment" />
       <meta property="og:description" content="View this media on Figment" />
-      <meta property="og:image" content="\${imgUrl}" />
-    \`;
+      <meta property="og:image" content="${imgUrl}" />
+    `;
 
-    const html = template.replace('</head>', \`\${ogTags}</head>\`);
+    const html = template.replace('</head>', `${ogTags}</head>`);
     res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
 
   } catch (e) {
@@ -577,7 +577,7 @@ app.get('*', (req, res) => {
 
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(\`Server running on http://localhost:\${PORT}\`);
+    console.log(`Server running on http://localhost:${PORT}`);
   });
 }
 
