@@ -512,7 +512,7 @@ export async function getBookDetails(id: string): Promise<GoogleBooksVolumeDetai
     }
 }
 
-export async function getAudioDetails(item: SearchResult & { header?: { subtitle?: string }, type?: string }): Promise<ITunesAudioAdapterInput> {
+export async function getAudioDetails(item: SearchResult & { header?: { subtitle?: string }, type?: string }): Promise<UniversalMediaData> {
   const artistName = item.subtitle || item.header?.subtitle || '';
   const titleName = item.title || '';
   const query = encodeURIComponent(`${titleName} ${artistName}`);
