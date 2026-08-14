@@ -4,101 +4,104 @@
  * 
  * Provides synchronous hydration of the SWR cache on cold boot.
  * - Reads from localStorage synchronously to ensure instant 0ms paints.
- * - Debounces writes to localStorage to prevent blocking the main thread during high-frequency optimistic UI updates (e.g., rapid liking).
+ * - Saves keys individually to prevent QuotaExceededError and avoid main thread blocking.
  * - Synchronizes state across multiple browser tabs natively.
  */
 
 export function swrLocalStorageProvider() {
   const map = new Map<string, any>();
-  const CACHE_KEY = 'figment-swr-cache';
+  const PREFIX = 'figment_swr_';
 
   // Defensive check for edge/SSR environments
   if (typeof window !== 'undefined') {
     
     // 1. Synchronous Cache Hydration on Cold Boot
     try {
-      const cacheData = localStorage.getItem(CACHE_KEY);
-      if (cacheData) {
-        const parsed = JSON.parse(cacheData);
-        // Safely rehydrate the Map graph
-        if (Array.isArray(parsed)) {
-          parsed.forEach(([key, value]: [string, any]) => {
-            map.set(key, value);
-          });
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(PREFIX)) {
+          const originalKey = key.slice(PREFIX.length);
+          const valueStr = localStorage.getItem(key);
+          if (valueStr) {
+            map.set(originalKey, JSON.parse(valueStr));
+          }
         }
       }
     } catch (err) {
       console.warn('Failed to parse SWR cache from localStorage', err);
     }
 
-    // 2. Debounced Cache Persistence (Main Thread Liberation)
-    let saveTimeout: ReturnType<typeof setTimeout> | null = null;
-    const saveCache = () => {
-      if (saveTimeout) clearTimeout(saveTimeout);
-      // Wait 1.5 seconds after mutations stop to commit the data out of the critical rendering path
-      saveTimeout = setTimeout(() => {
-        try {
-          const appCache = JSON.stringify(Array.from(map.entries()));
-          localStorage.setItem(CACHE_KEY, appCache);
-        } catch (err) {
-          if ((err as any).name === 'QuotaExceededError') {
-            console.warn('SWR Cache quota exceeded - clearing cache manually');
-            localStorage.removeItem(CACHE_KEY);
-            map.clear();
-          } else {
-            console.warn('Failed to persist SWR cache to localStorage', err);
-          }
+    const clearSwrCacheFromStorage = () => {
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        
+        // Explicitly protect Supabase auth keys
+        if (key.startsWith('sb-')) {
+          continue;
         }
-      }, 1500); 
+
+        if (key.startsWith(PREFIX)) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(k => localStorage.removeItem(k));
     };
 
-    // 3. Map Operations Hooking to trigger background saves
+    // 2. Map Operations Hooking to trigger saves
     const setOp = map.set.bind(map);
     map.set = (key: string, value: any) => {
       setOp(key, value);
-      saveCache();
+      try {
+        localStorage.setItem(PREFIX + key, JSON.stringify(value));
+      } catch (err) {
+        if ((err as any).name === 'QuotaExceededError') {
+          console.warn('SWR Cache quota exceeded - clearing cache manually');
+          // Clear only SWR keys, strictly ignore 'sb-' auth keys
+          clearSwrCacheFromStorage();
+          map.clear();
+        } else {
+          console.warn('Failed to persist SWR cache to localStorage', err);
+        }
+      }
       return map;
     };
 
     const deleteOp = map.delete.bind(map);
     map.delete = (key: string) => {
       const result = deleteOp(key);
-      saveCache();
+      try {
+        localStorage.removeItem(PREFIX + key);
+      } catch (e) {
+        // Ignore
+      }
       return result;
     };
 
     const clearOp = map.clear.bind(map);
     map.clear = () => {
       clearOp();
-      saveCache();
+      try {
+        clearSwrCacheFromStorage();
+      } catch (e) {
+        // Ignore
+      }
     };
 
-    // 4. Cross-tab Multitasking Synchronization
+    // 3. Cross-tab Multitasking Synchronization
     window.addEventListener('storage', (e) => {
-      if (e.key === CACHE_KEY && e.newValue) {
-        try {
-          const parsed = JSON.parse(e.newValue);
-          // Purge underlying native Map to bypass the set() interceptor and prevent an infinite loop
-          clearOp(); 
-          if (Array.isArray(parsed)) {
-            parsed.forEach(([key, value]: [string, any]) => {
-              setOp(key, value);
-            });
+      if (e.key && e.key.startsWith(PREFIX)) {
+        const originalKey = e.key.slice(PREFIX.length);
+        if (e.newValue === null) {
+          deleteOp(originalKey);
+        } else {
+          try {
+            setOp(originalKey, JSON.parse(e.newValue));
+          } catch (err) {
+            console.warn('Cross-tab sync parse failed', err);
           }
-        } catch (err) {
-          console.warn('Cross-tab sync failed', err);
         }
-      }
-    });
-
-    // 5. Hard flush when window unloads to avoid race condition misses
-    window.addEventListener('beforeunload', () => {
-      if (saveTimeout) clearTimeout(saveTimeout);
-      try {
-        const appCache = JSON.stringify(Array.from(map.entries()));
-        localStorage.setItem(CACHE_KEY, appCache);
-      } catch (err) {
-        // Silent catch for unloaded scopes
       }
     });
   }
